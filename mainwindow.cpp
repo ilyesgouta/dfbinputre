@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 
 #include <QMouseEvent>
+#include <QInputDialog>
 #include <QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -13,6 +14,7 @@ MainWindow::MainWindow(QWidget *parent) :
     setWindowTitle("DfbInputCapture");
 
     connect(ui->action_About, SIGNAL(activated()), this, SLOT(AboutBox()));
+    connect(ui->action_Connect, SIGNAL(activated()), this, SLOT(ConnectBox()));
 
     qApp->installEventFilter(this);
 }
@@ -20,6 +22,32 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::ConnectBox()
+{
+    bool ok;
+    QInputDialog *input = new QInputDialog(this);
+
+    QString result = input->getText(this, "Target UDP port",
+                                          "Target UDP port",
+                                          QLineEdit::Normal,
+                                          "10.157.6.141:5000", &ok);
+
+    delete input;
+
+    if (!ok || result.isEmpty())
+        return;
+
+    QString targetIpAddr = result.section(':', 0, 0);
+    int targetPort = result.section(':', 1, 1).toInt(&ok);
+
+    if (!ok)
+        targetPort = 5000;
+
+    QStringList list = targetIpAddr.split(".");
+    if (list.length() != 4)
+        return;
 }
 
 void MainWindow::AboutBox()

@@ -17,6 +17,7 @@ public:
 
 public slots:
     void AboutBox();
+    void ConnectBox();
 
 private:
     Ui::MainWindow *ui;
