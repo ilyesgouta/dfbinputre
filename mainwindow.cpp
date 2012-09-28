@@ -5,7 +5,7 @@
 #include <QInputDialog>
 #include <QMessageBox>
 
-MainWindow::MainWindow(QWidget *parent) :
+MainWindow::MainWindow(QWidget *parent, const QString& target) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
@@ -17,6 +17,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->action_Connect, SIGNAL(activated()), this, SLOT(ConnectBox()));
 
     qApp->installEventFilter(this);
+
+    m_target = target;
 }
 
 MainWindow::~MainWindow()
@@ -27,27 +29,38 @@ MainWindow::~MainWindow()
 void MainWindow::ConnectBox()
 {
     bool ok;
+
     QInputDialog *input = new QInputDialog(this);
 
     QString result = input->getText(this, "Target UDP port",
                                           "Target UDP port",
                                           QLineEdit::Normal,
-                                          "10.157.6.141:5000", &ok);
+                                          m_target, &ok);
 
     delete input;
 
     if (!ok || result.isEmpty())
         return;
 
-    QString targetIpAddr = result.section(':', 0, 0);
-    int targetPort = result.section(':', 1, 1).toInt(&ok);
+    if (parseTargetAddress(result))
+        m_target = result;
+}
+
+bool MainWindow::parseTargetAddress(const QString& address)
+{
+    bool ok;
+
+    QString targetIpAddr = address.section(':', 0, 0);
+    address.section(':', 1, 1).toInt(&ok);
 
     if (!ok)
-        targetPort = 5000;
+        return false;
 
     QStringList list = targetIpAddr.split(".");
     if (list.length() != 4)
-        return;
+        return false;
+
+    return true;
 }
 
 void MainWindow::AboutBox()

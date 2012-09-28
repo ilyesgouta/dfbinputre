@@ -12,7 +12,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow(QWidget *parent, const QString& target);
     ~MainWindow();
 
 public slots:
@@ -21,6 +21,14 @@ public slots:
 
 private:
     Ui::MainWindow *ui;
+
+    QString m_target;
+    QString m_targetIpAddr;
+    int m_targetPort;
+
+    bool m_connected;
+
+    bool parseTargetAddress(const QString& address);
 
     bool eventFilter(QObject *obj, QEvent *event);
 };
