@@ -1,6 +1,9 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <QUdpSocket>
+#include <QHostAddress>
+
 #include <QMainWindow>
 
 namespace Ui {
@@ -21,6 +24,8 @@ public slots:
 
 private:
     Ui::MainWindow *ui;
+
+    QUdpSocket *m_UdpSocket;
 
     QString m_target;
     QString m_targetIpAddr;

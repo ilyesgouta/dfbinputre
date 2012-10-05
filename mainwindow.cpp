@@ -16,9 +16,12 @@ MainWindow::MainWindow(QWidget *parent, const QString& target) :
     connect(ui->action_About, SIGNAL(activated()), this, SLOT(AboutBox()));
     connect(ui->action_Connect, SIGNAL(activated()), this, SLOT(ConnectBox()));
 
-    qApp->installEventFilter(this);
-
     m_target = target;
+
+    m_UdpSocket = 0;
+    m_connected = false;
+
+    ui->action_Connect->setText("Connect...");
 }
 
 MainWindow::~MainWindow()
@@ -30,20 +33,40 @@ void MainWindow::ConnectBox()
 {
     bool ok;
 
-    QInputDialog *input = new QInputDialog(this);
+    if (m_connected) {
+        qApp->removeEventFilter(this);
 
-    QString result = input->getText(this, "Target UDP port",
-                                          "Target UDP port",
-                                          QLineEdit::Normal,
-                                          m_target, &ok);
+        delete m_UdpSocket;
 
-    delete input;
+        m_UdpSocket = 0;
+        m_connected = false;
 
-    if (!ok || result.isEmpty())
-        return;
+        ui->action_Connect->setText("Connect...");
+    } else {
+        QInputDialog *input = new QInputDialog(this);
 
-    if (parseTargetAddress(result))
+        QString result = input->getText(this, "Target UDP port",
+                                              "Target UDP port",
+                                              QLineEdit::Normal,
+                                              m_target, &ok);
+
+        delete input;
+
+        if (!ok || result.isEmpty())
+            return;
+
+        if (!parseTargetAddress(result))
+            return;
+
         m_target = result;
+
+        m_UdpSocket = new QUdpSocket();
+        m_connected = true;
+
+        qApp->installEventFilter(this);
+
+        ui->action_Connect->setText("Disconnect");
+    }
 }
 
 bool MainWindow::parseTargetAddress(const QString& address)
