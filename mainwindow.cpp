@@ -92,9 +92,13 @@ void MainWindow::AboutBox()
                        "to DirectFB over the network. Written by Ilyes Gouta.");
 }
 
+#define UNUSED_PARAMETER(a) (a) = (a)
+
 bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 {
     static bool lowBoundary = false;
+
+    UNUSED_PARAMETER(obj);
 
     if (event->type() == QEvent::MouseMove) {
         QMouseEvent *e = static_cast<QMouseEvent *>(event);
