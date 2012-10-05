@@ -11,7 +11,7 @@ MainWindow::MainWindow(QWidget *parent, const QString& target) :
 {
     ui->setupUi(this);
 
-    setWindowTitle("DfbInputCapture");
+    setWindowTitle("DFbInputRe");
 
     connect(ui->action_About, SIGNAL(activated()), this, SLOT(AboutBox()));
     connect(ui->action_Connect, SIGNAL(activated()), this, SLOT(ConnectBox()));
@@ -88,7 +88,7 @@ bool MainWindow::parseTargetAddress(const QString& address)
 
 void MainWindow::AboutBox()
 {
-    QMessageBox::about(this, "DfbInputCapture", "A tool for redirecting local mouse and keyboard input "
+    QMessageBox::about(this, "DFbInputRe", "A tool for redirecting local mouse and keyboard input "
                        "to DirectFB over the network. Written by Ilyes Gouta.");
 }
 
