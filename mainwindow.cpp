@@ -84,6 +84,7 @@ void MainWindow::ConnectBox()
         qApp->installEventFilter(this);
 
         ui->action_Connect->setText("Disconnect");
+        grabMouse();
     }
 }
 
