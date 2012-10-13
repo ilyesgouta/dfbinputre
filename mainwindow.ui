@@ -27,8 +27,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Hold Ctrl to release
-the mouse and keyboard grab</string>
+     <string>Hold Ctrl to release the mouse grab</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignCenter</set>
@@ -44,7 +43,7 @@ the mouse and keyboard grab</string>
      <x>0</x>
      <y>0</y>
      <width>320</width>
-     <height>28</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
