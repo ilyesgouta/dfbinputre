@@ -46,8 +46,9 @@ private:
     QUdpSocket *m_UdpSocket;
 
     QString m_target;
-    QString m_targetIpAddr;
-    int m_targetPort;
+
+    unsigned int m_targetPort;
+    QHostAddress m_targetAddr;
 
     bool m_connected;
 

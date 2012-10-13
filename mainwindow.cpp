@@ -76,8 +76,6 @@ void MainWindow::ConnectBox()
         if (!parseTargetAddress(result))
             return;
 
-        m_target = result;
-
         m_UdpSocket = new QUdpSocket();
         m_connected = true;
 
@@ -93,7 +91,7 @@ bool MainWindow::parseTargetAddress(const QString& address)
     bool ok;
 
     QString targetIpAddr = address.section(':', 0, 0);
-    address.section(':', 1, 1).toInt(&ok);
+    unsigned int targetPort = address.section(':', 1, 1).toInt(&ok);
 
     if (!ok)
         return false;
@@ -101,6 +99,9 @@ bool MainWindow::parseTargetAddress(const QString& address)
     QStringList list = targetIpAddr.split(".");
     if (list.length() != 4)
         return false;
+
+    m_targetPort = targetPort;
+    m_targetAddr.setAddress(targetIpAddr);
 
     return true;
 }
