@@ -146,6 +146,13 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
         ui->statusBar->showMessage("Mouse click at " + position);
     }
 
+    if (event->type() == QEvent::MouseButtonDblClick) {
+        QMouseEvent *e = static_cast<QMouseEvent *>(event);
+
+        QString position = QString::number(e->globalX()) + "," + QString::number(e->globalY());
+        ui->statusBar->showMessage("Mouse double-click at " + position);
+    }
+
     if (event->type() == QEvent::Leave) {
         if (!interior)
             grabMouse();
