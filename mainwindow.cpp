@@ -112,6 +112,19 @@ void MainWindow::AboutBox()
                        "to DirectFB over the network. Written by Ilyes Gouta.");
 }
 
+int MainWindow::writeDatagram(DFbInputType type, unsigned int param0, unsigned int param1, unsigned int param2)
+{
+    DFbInputPacket packet;
+
+    packet.magic = MAGIC;
+    packet.type = type;
+    packet.keyascii = param0;
+    packet.cursor[0] = param1;
+    packet.cursor[1] = param2;
+
+    return m_UdpSocket->writeDatagram(reinterpret_cast<char*>(&packet), sizeof(packet), m_targetAddr, m_targetPort);
+}
+
 #define UNUSED_PARAMETER(a) (a) = (a)
 
 bool MainWindow::eventFilter(QObject *obj, QEvent *event)
@@ -126,17 +139,23 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
         QString position = QString::number(e->globalX()) + "," + QString::number(e->globalY());
 
         interior = frameGeometry().contains(e->globalPos());
-        ui->statusBar->showMessage("Mouse move " + position + " - interior: " + QString::number(interior));
+        ui->statusBar->showMessage("Mouse move " + position);
+
+        writeDatagram(DFBINPUT_MOUSE_MOTION, 0, e->globalX(), e->globalY());
     }
 
     if (event->type() == QEvent::KeyPress) {
         QKeyEvent *e = static_cast<QKeyEvent *>(event);
         if (e->modifiers() & Qt::ControlModifier) {
-            releaseMouse();
-            ui->statusBar->showMessage("Released mouse grab");
-            return true;
+            if (interior) {
+                releaseMouse();
+                ui->statusBar->showMessage("Released mouse grab");
+            }
         } else {
             ui->statusBar->showMessage("Key press " + e->text());
+
+            if (e->text().length() > 0)
+                writeDatagram(DFBINPUT_KEYPRESS, e->text().at(0).toAscii(), 0, 0);
         }
     }
 
@@ -145,6 +164,8 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 
         QString position = QString::number(e->globalX()) + "," + QString::number(e->globalY());
         ui->statusBar->showMessage("Mouse click at " + position);
+
+        writeDatagram(DFBINPUT_MOUSE_CLICK, 0, e->globalX(), e->globalY());
     }
 
     if (event->type() == QEvent::MouseButtonDblClick) {
@@ -152,6 +173,8 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 
         QString position = QString::number(e->globalX()) + "," + QString::number(e->globalY());
         ui->statusBar->showMessage("Mouse double-click at " + position);
+
+        writeDatagram(DFBINPUT_MOUSE_DBLCLICK, 0, e->globalX(), e->globalY());
     }
 
     if (event->type() == QEvent::Leave) {

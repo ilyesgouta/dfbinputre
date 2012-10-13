@@ -28,6 +28,22 @@ namespace Ui {
     class MainWindow;
 }
 
+#define MAGIC 0xc001feed
+
+typedef enum {
+    DFBINPUT_MOUSE_MOTION = 1,
+    DFBINPUT_MOUSE_CLICK,
+    DFBINPUT_MOUSE_DBLCLICK,
+    DFBINPUT_KEYPRESS
+} DFbInputType;
+
+typedef struct DFbInputPacket {
+    unsigned int magic;
+    DFbInputType type;
+    unsigned int keyascii;
+    unsigned int cursor[2];
+} DFbInputPacket __attribute__((packed));
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -53,6 +69,7 @@ private:
     bool m_connected;
 
     bool parseTargetAddress(const QString& address);
+    int writeDatagram(DFbInputType type, unsigned int param0, unsigned int param1, unsigned int param2);
 
     bool eventFilter(QObject *obj, QEvent *event);
 };
