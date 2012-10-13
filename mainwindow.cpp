@@ -114,7 +114,7 @@ void MainWindow::AboutBox()
 
 bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 {
-    static bool lowBoundary = false;
+    static bool interior = false;
 
     UNUSED_PARAMETER(obj);
 
@@ -122,15 +122,16 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
         QMouseEvent *e = static_cast<QMouseEvent *>(event);
 
         QString position = QString::number(e->globalX()) + "," + QString::number(e->globalY());
-        ui->statusBar->showMessage("Mouse move " + position);
 
-        lowBoundary = e->y() < 32;
+        interior = frameGeometry().contains(e->globalPos());
+        ui->statusBar->showMessage("Mouse move " + position + " - interior: " + QString::number(interior));
     }
 
     if (event->type() == QEvent::KeyPress) {
         QKeyEvent *e = static_cast<QKeyEvent *>(event);
         if (e->modifiers() & Qt::ControlModifier) {
             releaseMouse();
+            ui->statusBar->showMessage("Released mouse grab");
             return true;
         } else {
             ui->statusBar->showMessage("Key press " + e->text());
@@ -145,7 +146,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
     }
 
     if (event->type() == QEvent::Leave) {
-        if (!lowBoundary)
+        if (!interior)
             grabMouse();
     }
 
