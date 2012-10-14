@@ -129,57 +129,61 @@ int MainWindow::writeDatagram(DFbInputType type, unsigned int param0, unsigned i
 
 bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 {
+    QKeyEvent *kevent;
+    QMouseEvent *mevent;
+    QString position;
+
     static bool interior = false;
 
     UNUSED_PARAMETER(obj);
 
-    if (event->type() == QEvent::MouseMove) {
-        QMouseEvent *e = static_cast<QMouseEvent *>(event);
+    switch (event->type()) {
+    case QEvent::MouseMove:
+        mevent = static_cast<QMouseEvent *>(event);
 
-        QString position = QString::number(e->globalX()) + "," + QString::number(e->globalY());
+        position = QString::number(mevent->globalX()) + "," + QString::number(mevent->globalY());
 
-        interior = frameGeometry().contains(e->globalPos());
+        interior = frameGeometry().contains(mevent->globalPos());
         ui->statusBar->showMessage("Mouse move " + position);
 
-        writeDatagram(DFBINPUT_MOUSE_MOTION, 0, e->globalX(), e->globalY());
-    }
-
-    if (event->type() == QEvent::KeyPress) {
-        QKeyEvent *e = static_cast<QKeyEvent *>(event);
-        if (e->modifiers() & Qt::ControlModifier) {
+        writeDatagram(DFBINPUT_MOUSE_MOTION, 0, mevent->globalX(), mevent->globalY());
+        break;
+    case QEvent::KeyPress:
+        kevent = static_cast<QKeyEvent *>(event);
+        if (kevent->modifiers() & Qt::ControlModifier) {
             if (interior) {
                 releaseMouse();
                 ui->statusBar->showMessage("Released mouse grab");
             }
         } else {
-            ui->statusBar->showMessage("Key press " + e->text());
+            ui->statusBar->showMessage("Key press " + kevent->text());
 
-            if (e->text().length() > 0)
-                writeDatagram(DFBINPUT_KEYPRESS, e->text().at(0).toAscii(), 0, 0);
+            if (kevent->text().length() > 0)
+                writeDatagram(DFBINPUT_KEYPRESS, kevent->text().at(0).toAscii(), 0, 0);
         }
-    }
+        break;
+    case QEvent::MouseButtonPress:
+        mevent = static_cast<QMouseEvent *>(event);
 
-    if (event->type() == QEvent::MouseButtonPress) {
-        QMouseEvent *e = static_cast<QMouseEvent *>(event);
-
-        QString position = QString::number(e->globalX()) + "," + QString::number(e->globalY());
+        position = QString::number(mevent->globalX()) + "," + QString::number(mevent->globalY());
         ui->statusBar->showMessage("Mouse click at " + position);
 
-        writeDatagram(DFBINPUT_MOUSE_CLICK, 0, e->globalX(), e->globalY());
-    }
+        writeDatagram(DFBINPUT_MOUSE_CLICK, 0, mevent->globalX(), mevent->globalY());
+        break;
+    case QEvent::MouseButtonDblClick:
+        mevent = static_cast<QMouseEvent *>(event);
 
-    if (event->type() == QEvent::MouseButtonDblClick) {
-        QMouseEvent *e = static_cast<QMouseEvent *>(event);
-
-        QString position = QString::number(e->globalX()) + "," + QString::number(e->globalY());
+        position = QString::number(mevent->globalX()) + "," + QString::number(mevent->globalY());
         ui->statusBar->showMessage("Mouse double-click at " + position);
 
-        writeDatagram(DFBINPUT_MOUSE_DBLCLICK, 0, e->globalX(), e->globalY());
-    }
-
-    if (event->type() == QEvent::Leave) {
+        writeDatagram(DFBINPUT_MOUSE_DBLCLICK, 0, mevent->globalX(), mevent->globalY());
+        break;
+    case QEvent::Leave:
         if (!interior)
             grabMouse();
+        break;
+    default:
+        break;
     }
 
     return false;
