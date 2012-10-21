@@ -68,10 +68,15 @@ private:
 
     bool m_connected;
 
+    bool m_mouseAcquired;
+
     bool parseTargetAddress(const QString& address);
     int writeDatagram(DFbInputType type, unsigned int param0, unsigned int param1, unsigned int param2);
 
     bool eventFilter(QObject *obj, QEvent *event);
+
+    void keyPressEvent(QKeyEvent *event);
+    void mousePressEvent(QMouseEvent *event);
 };
 
 #endif // MAINWINDOW_H

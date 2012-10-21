@@ -39,6 +39,8 @@ MainWindow::MainWindow(QWidget *parent, const QString& target) :
     m_UdpSocket = 0;
     m_connected = false;
 
+    m_mouseAcquired = false;
+
     ui->action_Connect->setText("Connect...");
 }
 
@@ -52,12 +54,15 @@ void MainWindow::ConnectBox()
     bool ok;
 
     if (m_connected) {
-        qApp->removeEventFilter(this);
 
         delete m_UdpSocket;
 
         m_UdpSocket = 0;
         m_connected = false;
+
+        m_mouseAcquired = false;
+
+        releaseMouse();
 
         ui->action_Connect->setText("Connect...");
     } else {
@@ -79,10 +84,11 @@ void MainWindow::ConnectBox()
         m_UdpSocket = new QUdpSocket();
         m_connected = true;
 
-        qApp->installEventFilter(this);
+        m_mouseAcquired = false;
+
+        releaseMouse();
 
         ui->action_Connect->setText("Disconnect");
-        grabMouse();
     }
 }
 
@@ -123,6 +129,32 @@ int MainWindow::writeDatagram(DFbInputType type, unsigned int param0, unsigned i
     packet.cursor[1] = param2;
 
     return m_UdpSocket->writeDatagram(reinterpret_cast<char*>(&packet), sizeof(packet), m_targetAddr, m_targetPort);
+}
+
+void MainWindow::keyPressEvent(QKeyEvent *event)
+{
+    if (m_mouseAcquired) {
+        if (event->modifiers() & Qt::ControlModifier) {
+            releaseMouse();
+            m_mouseAcquired = false;
+
+            ui->statusBar->showMessage("Mouse released");
+
+            qApp->removeEventFilter(this);
+        }
+    }
+}
+
+void MainWindow::mousePressEvent(QMouseEvent *event)
+{
+    if (m_connected && !m_mouseAcquired) {
+        grabMouse();
+        m_mouseAcquired = true;
+
+        ui->statusBar->showMessage("Mouse acquired");
+
+        qApp->installEventFilter(this);
+    }
 }
 
 #define UNUSED_PARAMETER(a) (a) = (a)
