@@ -115,7 +115,7 @@ bool MainWindow::parseTargetAddress(const QString& address)
 void MainWindow::AboutBox()
 {
     QMessageBox::about(this, "DFbInputRe", "A tool for redirecting local mouse and keyboard input "
-                       "to DirectFB over the network. Written by Ilyes Gouta.");
+                       "to DirectFB over the network. Written by Ilyes Gouta, ilyes.gouta@gmail.com");
 }
 
 int MainWindow::writeDatagram(DFbInputType type, unsigned int param0, unsigned int param1, unsigned int param2)
