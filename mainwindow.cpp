@@ -125,6 +125,7 @@ int MainWindow::writeDatagram(DFbInputType type, unsigned int param0, unsigned i
     packet.magic = MAGIC;
     packet.type = type;
     packet.keyascii = param0;
+    packet.button = param0;
     packet.cursor[0] = param1;
     packet.cursor[1] = param2;
 
@@ -202,7 +203,9 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
             position = QString::number(mevent->globalX()) + "," + QString::number(mevent->globalY());
             ui->statusBar->showMessage("Mouse click at " + position);
 
-            writeDatagram(DFBINPUT_MOUSE_CLICK, 0, mevent->globalX(), mevent->globalY());
+            writeDatagram(DFBINPUT_MOUSE_CLICK, mevent->button() == Qt::LeftButton ? 1 :
+                                                (mevent->button() == Qt::RightButton ? 2 : 0),
+                          mevent->globalX(), mevent->globalY());
         }
         break;
     case QEvent::MouseButtonDblClick:
@@ -212,7 +215,9 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
             position = QString::number(mevent->globalX()) + "," + QString::number(mevent->globalY());
             ui->statusBar->showMessage("Mouse double-click at " + position);
 
-            writeDatagram(DFBINPUT_MOUSE_DBLCLICK, 0, mevent->globalX(), mevent->globalY());
+            writeDatagram(DFBINPUT_MOUSE_DBLCLICK, mevent->button() == Qt::LeftButton ? 1 :
+                                                   (mevent->button() == Qt::RightButton ? 2 : 0),
+                          mevent->globalX(), mevent->globalY());
         }
         break;
     case QEvent::Leave:

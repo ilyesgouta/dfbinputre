@@ -34,6 +34,7 @@ typedef struct DFbInputPacket {
     uint32_t magic;
     uint32_t type;
     uint32_t keyascii;
+    uint32_t button; /* 1 for the left button, 2 for the right button */
     uint32_t cursor[2];
 } DFbInputPacket __attribute__((packed));
 
